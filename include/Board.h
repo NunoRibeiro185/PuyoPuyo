@@ -4,7 +4,6 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include "Piece.h"
-#include "Color.h"
 #include "Utils.h"
 #include <iostream>
 #include <vector>

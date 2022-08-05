@@ -1,5 +1,4 @@
 #include "Piece.h"
-#include "Color.h"
 #include "Utils.h"
 
 /**
