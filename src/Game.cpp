@@ -113,6 +113,10 @@ void Game::GameStart(){
                 if(e.type == SDL_QUIT){
                     board.state = EXIT;
                 }
+                
+                if(e.type == SDL_KEYUP){
+                    SDL_FlushEvent(SDL_KEYDOWN);
+                }
 
                 if(e.type == SDL_KEYDOWN){
 
@@ -127,6 +131,7 @@ void Game::GameStart(){
                         last_tick = 0;
                     }
                 }
+
 
                 if(UtilsTime() - last_tick >= tick && board.state != DELETING_PIECES){
                     board.PlayerInput(SDLK_s);
@@ -161,9 +166,11 @@ void Game::GameStart(){
 
             case GAMEOVER:
                 board.GameOver();
-                if(e.type == SDLK_RETURN){
-                    board.state = STARTING;
-                    board.Reset();
+                if(e.type == SDL_KEYDOWN){
+                    if(e.key.keysym.sym == SDLK_RETURN){
+                        board.state = STARTING;
+                        board.Reset();
+                    }
                 }
                 break;
 
