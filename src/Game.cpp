@@ -51,8 +51,7 @@ void Game::GameStart(){
                         "SDL_Error: %s\n", SDL_GetError());
     }
     printf("Renderer it is!\n");
-    //TTF Fonts init
-    TTF_Init();
+    
 
     last_tick = UtilsTime();
 
