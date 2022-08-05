@@ -55,10 +55,14 @@ S - Move Down Faster
 E - Turn 90 Degrees Right     |
                               V
                             ___
-Q - Turn -90 Degrees Left  |  
+Q - Turn 90 Degrees Left   |  
                            V
 
 ESC - Quit
 P - Pause
 
 ENTER after Game Over - Restart
+
+## Notes
+
+- Some bugs need fixing
