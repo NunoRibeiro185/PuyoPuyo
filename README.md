@@ -3,7 +3,6 @@ Simple Puyo Puyo game in C++ with SDL
 
 ## Dependencies
 
-- [Git][]
 - C Compiler (gcc, ...)
 - [CMake][]
 - [SDL2][SDL] library
@@ -12,7 +11,7 @@ Simple Puyo Puyo game in C++ with SDL
 **On Debian/Ubuntu based distributions, use the following command:**
 
 ```sh
-sudo apt install git build-essential pkg-config cmake cmake-data libsdl2-dev libsdl2-gfx-dev
+sudo apt install build-essential pkg-config cmake cmake-data libsdl2-dev libsdl2-gfx-dev
 ```
 
 **Optional packages:**
@@ -33,7 +32,7 @@ sudo apt install libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev libsdl2-mixer
 git clone https://github.com/NunoRibeiro185/PuyoPuyo.git
 cd PuyoPuyo
 
-# Create a build folder
+# Create a build folder (if it doesn't exist already)
 mkdir build
 cd build
 

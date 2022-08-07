@@ -52,14 +52,14 @@ int* Board::WindowSize(){
 	int *size = new int[2];
 
 	//Title uses 1 puyo height (Block)
-	size[0] = (MARGIN * 2) + (PUYO_WIDTH * (cols + 4));
+	size[0] = (MARGIN * 2) + (PUYO_WIDTH * (cols + 2) + MARGIN);
 	size[1] = (MARGIN * 2) + (PUYO_HEIGHT * (rows + 1) + PUYO_HEIGHT);
 
 	return size;
 }
 
 void Board::CalcScreenSize(){
-	width_px = (MARGIN * 2) + (PUYO_WIDTH * (cols + 4) + PUYO_WIDTH);
+	width_px = (MARGIN * 2) + (PUYO_WIDTH * (cols + 2) + MARGIN + PUYO_WIDTH);
 	heigth_px = (MARGIN * 2) + (PUYO_HEIGHT * (rows + 1) + PUYO_HEIGHT);
 }
 
@@ -473,10 +473,10 @@ Uint32 Board::ChangeDifficulty(Uint32 tick){
 	if(tick > 250){
 		tick -= 25;
 	}
-	else if(tick > 100){
+	else if(tick > 125){
 		tick -= 10;
 	}
-	else if(tick >25){
+	else if(tick >75){
 		tick -= 1;
 	}
 	return tick;
