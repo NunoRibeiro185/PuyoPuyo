@@ -81,5 +81,3 @@ However here are some thing that could be added with more time/if wanted:
 - Score
 - Pause Menu
 - Game Over Screen
-- Speed Up Mechanic
-- Pieces coming up next 

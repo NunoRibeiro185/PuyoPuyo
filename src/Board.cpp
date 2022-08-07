@@ -52,14 +52,14 @@ int* Board::WindowSize(){
 	int *size = new int[2];
 
 	//Title uses 1 puyo height (Block)
-	size[0] = (MARGIN * 2) + (PUYO_WIDTH * (cols));
+	size[0] = (MARGIN * 2) + (PUYO_WIDTH * (cols + 4));
 	size[1] = (MARGIN * 2) + (PUYO_HEIGHT * (rows + 1) + PUYO_HEIGHT);
 
 	return size;
 }
 
 void Board::CalcScreenSize(){
-	width_px = (MARGIN * 2) + (PUYO_WIDTH * (cols ) + PUYO_WIDTH);
+	width_px = (MARGIN * 2) + (PUYO_WIDTH * (cols + 4) + PUYO_WIDTH);
 	heigth_px = (MARGIN * 2) + (PUYO_HEIGHT * (rows + 1) + PUYO_HEIGHT);
 }
 
@@ -247,9 +247,8 @@ void Board::PlayerInput(SDL_Keycode key){
 		}
 		else{
 			//If there are nothing to erase, start other piece from the top
-			DropNewPiece();
 			if (state != GAMEOVER)
-				state = WAITING;
+				state = DROP;
 		}
 	}
 	SDL_FlushEvent(SDL_KEYDOWN);
@@ -358,14 +357,14 @@ void Board::DropNewPiece(){
 	//Create 2 new pieces (pair) of random colors
 	if(!IsPieceFalling() && state != GAMEOVER){
 		//Piece 1
-		board[cols/2][0].color = UtilsRandomColor();
+		board[cols/2][0].color = queue[0];
 		board[cols/2][0].falling = true;
 		board[cols/2][0].moving = true;
 		board[cols/2][0].free = false;
 		board[cols/2][0].pivot = false; //Rotate around this one
 
 		//Piece 2
-		board[cols/2 - 1][0].color = UtilsRandomColor();
+		board[cols/2 - 1][0].color = queue[1];
 		board[cols/2 - 1][0].falling = true;
 		board[cols/2 - 1][0].moving = true;
 		board[cols/2 - 1][0].free = false;
@@ -374,7 +373,19 @@ void Board::DropNewPiece(){
 		//Add to pieces
 		pieces.push_back(board[cols/2][0]);
 		pieces.push_back(board[cols/2 - 1][0]);
+
+		//Remove Colors from Queue
+		queue.pop_back();
+		queue.pop_back();
+
+		//Refill Queue
+		RefillQueue();
 	}
+}
+
+void Board::RefillQueue(){
+	queue.push_back(UtilsRandomColor());
+	queue.push_back(UtilsRandomColor());
 }
 
 bool Board::IsPieceFalling(){
@@ -414,6 +425,7 @@ void Board::Draw(){
 			DrawPieces(board[x][y], board[x][y].color);
 		}
 	}
+	DrawQueue();
 }
 
 void Board::DrawPieces(Piece piece, SDL_Color color){
@@ -426,6 +438,16 @@ void Board::DrawPieces(Piece piece, SDL_Color color){
 
 	SDL_Rect Rect2 = {x + MARGIN + 2, y + PUYO_HEIGHT + 2, PUYO_WIDTH - 4 , PUYO_HEIGHT - 4};
 	SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, 0);
+	SDL_RenderFillRect(renderer, &Rect2);
+}
+
+void Board::DrawQueue(){
+	SDL_Rect Rect = {PUYO_WIDTH * cols + (MARGIN * 2), PUYO_HEIGHT + MARGIN, PUYO_WIDTH, PUYO_HEIGHT};
+	SDL_SetRenderDrawColor(renderer, queue[1].r, queue[1].g, queue[1].b, 0);
+	SDL_RenderFillRect(renderer, &Rect);
+
+	SDL_Rect Rect2 = {PUYO_WIDTH * cols + (MARGIN * 2) + PUYO_WIDTH + 2, PUYO_HEIGHT + MARGIN, PUYO_WIDTH, PUYO_HEIGHT};
+	SDL_SetRenderDrawColor(renderer, queue[0].r, queue[0].g, queue[0].b, 0);
 	SDL_RenderFillRect(renderer, &Rect2);
 }
 
@@ -445,4 +467,17 @@ void Board::DrawScreenBoard(){
 	SDL_Rect sdl_board = {MARGIN,  PUYO_HEIGHT + MARGIN, (PUYO_WIDTH * cols), (PUYO_HEIGHT * rows)};
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 	SDL_RenderDrawRect(renderer, &sdl_board);
+}
+
+Uint32 Board::ChangeDifficulty(Uint32 tick){
+	if(tick > 250){
+		tick -= 25;
+	}
+	else if(tick > 100){
+		tick -= 10;
+	}
+	else if(tick >25){
+		tick -= 1;
+	}
+	return tick;
 }

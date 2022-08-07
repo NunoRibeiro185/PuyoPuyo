@@ -98,11 +98,17 @@ void Game::GameStart(){
             case STARTING:
                 //Init screen
                 board.Init(renderer);
+                board.RefillQueue();
                 board.DropNewPiece(); //Drop first piece
                 board.Draw();
-                board.state = WAITING;
+                board.state = DROP;
                 break;
-            case WAITING:
+            case DROP:
+                board.DropNewPiece();
+                tick = board.ChangeDifficulty(tick);
+                printf("TICK= %d\n", tick);
+                board.state = PRESSING_KEY;
+                break;
             case PRESSING_KEY:
                 if(e.type == SDL_QUIT){ //click x on the window
                     board.state = EXIT; //Exit game
@@ -145,8 +151,7 @@ void Game::GameStart(){
                 }
                 else{
                     board.keyboard = true; //Make sure player can use keyboard when new piece drops
-                    board.DropNewPiece(); //If nothing to be destroyed drop a new piece
-                    board.state = WAITING;
+                    board.state = DROP;
                 }
                 break;
 

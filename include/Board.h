@@ -14,7 +14,7 @@ static const int PUYO_WIDTH = 58;
 static const int PUYO_HEIGHT = 58;
 
 enum Direction{ LEFT=0, RIGHT, UP, DOWN};
-enum State { STARTING=0, PAUSE, GAMEOVER, EXIT, WAITING, PRESSING_KEY, SORTING_PIECES, DELETING_PIECES};
+enum State { STARTING=0, PAUSE, GAMEOVER, EXIT, DROP, PRESSING_KEY, SORTING_PIECES, DELETING_PIECES};
 
 class Board {
     public:
@@ -32,6 +32,9 @@ class Board {
 
     void Draw();
 	void DrawScreenBoard();
+    void DrawQueue();
+    void DrawPieces(Piece, SDL_Color);
+    void RedrawPieces(Piece, Piece);
 
     int* WindowSize();
 
@@ -39,10 +42,9 @@ class Board {
     void Move(Piece, int);
 
     void DropNewPiece();
+    Uint32 ChangeDifficulty(Uint32);
+    void RefillQueue();
     bool UpdateFalling();
-
-    void DrawPieces(Piece, SDL_Color);
-    void RedrawPieces(Piece, Piece);
 
     bool SearchPuyos();
     bool ClearConnectedPieces();
@@ -62,6 +64,7 @@ class Board {
 
     std::vector<Piece> pieces;
     std::vector<Piece> connected_pieces;
+    std::vector<SDL_Color> queue;
     std::vector<std::vector<Piece>> pieces_erase;
 
     Piece **board;
