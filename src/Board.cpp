@@ -70,8 +70,8 @@ bool Board::UpdateFalling(){
 			if(board[x][y].free){
 				continue;
 			}
-			if (board[x][y + 1].free && !board[x][y].free){
-				Move(board[x][y], DOWN);
+			if (!board[x][y].free && board[x][y + 1].free){ //Check if it's a piece and if the spot bellow is free
+				Move(board[x][y], DOWN); //Move piece down
 				flag = true;
 			}
 		}
@@ -80,7 +80,7 @@ bool Board::UpdateFalling(){
 }
 
 void Board::PlayerInput(SDL_Keycode key){
-
+	//Reset active pieces 
 	pieces.clear();
 	for(int x = 0; x < cols; x++){
 		for(int y = 0; y < rows; y++){
@@ -390,8 +390,8 @@ bool Board::IsPieceFalling(){
 
 bool Board::ClearConnectedPieces(){
 	bool flag = false;
-	if(pieces_erase.size() > 0){
-		std::vector<Piece> erasing = pieces_erase.back();
+	if(pieces_erase.size() > 0){ //If there are pieces to erase
+		std::vector<Piece> erasing = pieces_erase.back(); //pieces to erase
 		pieces_erase.pop_back();
 
 		for(Piece p: erasing){
@@ -401,7 +401,7 @@ bool Board::ClearConnectedPieces(){
 					flag = true;
 				}
 			}
-			board[p.x][p.y].Reset();
+			board[p.x][p.y].Reset(); //reset piece to board defaults (Color = Black, Edge = White etc,etc)
 		}
 	}
 	return flag;

@@ -72,11 +72,9 @@ My main focus was the criteria presented in the document as I knew I would be ti
 because I couldn't spend many hours daily working on this exercise. 
 
 Some bugs that need fixing:
-- !!!FIXED!!! When rotating fast there's a scenario where one of the pieces the player is controlling 
-overlaps with one on the board and replaces it 
-I believe this happens when the turn and the move down actions are performed in close proximity
 - Some slow downs here and there that could be fixed with some optimization
 - Moving with arrow keys is much faster
+- Falling faster feature when player isn't in control isn't fully functional
 
 For this exercise I stuck to the things that were asked for the sake of brevity
 However here are some thing that could be added with more time/if wanted:

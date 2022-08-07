@@ -21,7 +21,7 @@ void Game::GameStart(){
     //Ticks
     tick = 750;
 
-    UtilsRandInit();
+    UtilsRandInit(); //Initiate Random Seed
 
     printf("Going to Start SDL\n");
     // Initialize SDL
@@ -173,11 +173,11 @@ void Game::GameStart(){
         }
 
         if(board.state != GAMEOVER && board.state != PAUSE){
-            board.Draw();
+            board.Draw(); //Draw Board
         }
 
-        SDL_RenderPresent(renderer);
+        SDL_RenderPresent(renderer); //Render
 
-        SDL_framerateDelay(&fpsmanager);
+        SDL_framerateDelay(&fpsmanager); //30fps 
     }
 }
