@@ -19,7 +19,7 @@ void Game::GameStart(){
     bool pause = false;
 
     //Ticks
-    tick = 850;
+    tick = 750;
 
     UtilsRandInit();
 
@@ -53,7 +53,7 @@ void Game::GameStart(){
     printf("Renderer it is!\n");
     
 
-    last_tick = UtilsTime();
+    last_tick = SDL_GetTicks();
 
     FPSmanager fpsmanager;
     SDL_initFramerate(&fpsmanager);
@@ -98,63 +98,54 @@ void Game::GameStart(){
             case STARTING:
                 //Init screen
                 board.Init(renderer);
-                board.DropNewPiece();
+                board.DropNewPiece(); //Drop first piece
                 board.Draw();
-                board.state = FALLING_PIECE;
-                break;
-            case FALLING_PIECE:
-                board.UpdateFalling();
                 board.state = WAITING;
                 break;
-
             case WAITING:
             case PRESSING_KEY:
-                if(e.type == SDL_QUIT){
-                    board.state = EXIT;
+                if(e.type == SDL_QUIT){ //click x on the window
+                    board.state = EXIT; //Exit game
                 }
                 
-                if(e.type == SDL_KEYUP){
-                    SDL_FlushEvent(SDL_KEYDOWN);
-                }
-
                 if(e.type == SDL_KEYDOWN){
 
-                    if(e.key.keysym.sym == SDLK_ESCAPE){
-                        board.state = EXIT;
+                    if(e.key.keysym.sym == SDLK_ESCAPE){ //press escape
+                        board.state = EXIT; // Exit game
                     }
 
                     if(board.keyboard){
                         board.PlayerInput(e.key.keysym.sym);
                     }
-                    else{ //Fall fast if only one
+                    else{ //Fall fast if only one || Feature disabled
                         last_tick = 0;
                     }
                 }
 
-
-                if(UtilsTime() - last_tick >= tick && board.state != DELETING_PIECES){
-                    board.PlayerInput(SDLK_s);
-                    last_tick = UtilsTime();
+                if(SDL_GetTicks() - last_tick >= tick && board.state != DELETING_PIECES){
+                    board.PlayerInput(SDLK_s); //Move active pieces down = pressing the S key
+                    last_tick = SDL_GetTicks();
                 }
                 break;
             case SORTING_PIECES:
                 if(!board.keyboard){
-                    last_tick = 0;
+                    last_tick = 0; //Pieces fall faster || Feature disabled
                 }
-                if(UtilsTime() - last_tick > 300){
-                    if(!board.UpdateFalling2()){
+                if(SDL_GetTicks() - last_tick > 300){
+                    if(!board.UpdateFalling()){
                         board.state = DELETING_PIECES;
-                        board.SearchPuyos();
+                        board.SearchPuyos(); //find groups of 4+ pices aka Puyos
                     }
-                    last_tick = UtilsTime();
+                    last_tick = SDL_GetTicks();
                 }
                 break;
             case DELETING_PIECES:
-                if(board.ClearConnectedPieces()){
-                    board.state = SORTING_PIECES;
+                if(board.ClearConnectedPieces()){ //delete groups of 4+ pieces
+                    board.state = SORTING_PIECES; //Resort that pieces in case some were destroyed
                 }
                 else{
-                    board.DropNewPiece();
+                    board.keyboard = true; //Make sure player can use keyboard when new piece drops
+                    board.DropNewPiece(); //If nothing to be destroyed drop a new piece
                     board.state = WAITING;
                 }
                 break;
@@ -164,17 +155,17 @@ void Game::GameStart(){
                 break;
 
             case GAMEOVER:
-                board.GameOver();
+                //Insert Game Over Screen
                 if(e.type == SDL_KEYDOWN){
                     if(e.key.keysym.sym == SDLK_RETURN){
                         board.state = STARTING;
-                        board.Reset();
+                        board.Reset(); //Reset board and start over
                     }
                 }
                 break;
 
             case PAUSE:
-                board.Pause();
+                //Insert Pause Menu 
                 break;
 
             default:

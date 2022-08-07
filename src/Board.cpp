@@ -43,7 +43,6 @@ void Board::Init(SDL_Renderer *renderer){
     this->renderer = renderer;
 	Reset();
     CalcScreenSize();
-
 	//Draw game screen
 	DrawScreenBoard();
 
@@ -52,42 +51,26 @@ void Board::Init(SDL_Renderer *renderer){
 int* Board::WindowSize(){
 	int *size = new int[2];
 
-	//The score section needs 3 columns and title uses 1 puyo height (Block)
-	size[0] = (MARGIN * 2) + (PUYO_WIDTH * (cols + 3));
+	//Title uses 1 puyo height (Block)
+	size[0] = (MARGIN * 2) + (PUYO_WIDTH * (cols));
 	size[1] = (MARGIN * 2) + (PUYO_HEIGHT * (rows + 1) + PUYO_HEIGHT);
 
 	return size;
 }
 
 void Board::CalcScreenSize(){
-	width_px = (MARGIN * 2) + (PUYO_WIDTH * (cols + 3) + PUYO_WIDTH);
+	width_px = (MARGIN * 2) + (PUYO_WIDTH * (cols ) + PUYO_WIDTH);
 	heigth_px = (MARGIN * 2) + (PUYO_HEIGHT * (rows + 1) + PUYO_HEIGHT);
 }
 
 bool Board::UpdateFalling(){
 	bool flag = false;
 	for(int x = 0; x < cols; x++){
-		for(int y = rows - 1 ; y >= 0; y--){
-			if(y <= 0){
-				continue;
-			}
-			if (board[x][y].falling && !board[x][y].free){
-				Move(board[x][y], DOWN);
-				flag = true;
-			}
-		}
-	}
-	return flag;
-}
-
-bool Board::UpdateFalling2(){
-	bool flag = false;
-	for(int x = 0; x < cols; x++){
-		for(int y = rows - 2 ; y >= 0; y--){
+		for(int y = rows - 2 ; y >= 0; y--){ //Don't need to check last row as you can't fall any further
 			if(board[x][y].free){
 				continue;
 			}
-			if (board[x][y + 1].free){
+			if (board[x][y + 1].free && !board[x][y].free){
 				Move(board[x][y], DOWN);
 				flag = true;
 			}
@@ -111,8 +94,7 @@ void Board::PlayerInput(SDL_Keycode key){
 	keyboard = pieces.size() == 1 ? false : true;
 
 	if (pieces.size() > 0){
-		if(key == SDLK_s){ //MOVE DOWN 
-			keyboard = !keyboard;
+		if(key == SDLK_s || key == SDLK_DOWN){ //MOVE DOWN 
 			if(pieces.size() >= 2){
 				Piece piece1 = pieces[0];
 				Piece piece2 = pieces[1];
@@ -130,9 +112,8 @@ void Board::PlayerInput(SDL_Keycode key){
 					Move(piece, DOWN);
 				}
 			}
-			keyboard = !keyboard;
 		}
-		else if(key == SDLK_a){ //MOVE LEFT
+		else if(key == SDLK_a || key == SDLK_LEFT){ //MOVE LEFT
 			if(pieces.size() >= 2){
 				Piece piece1 = pieces[0];
 				Piece piece2 = pieces[1];
@@ -146,7 +127,7 @@ void Board::PlayerInput(SDL_Keycode key){
 				}
 			}
 		}
-		else if(key == SDLK_d){ //MOVE RIGHT
+		else if(key == SDLK_d || key == SDLK_RIGHT){ //MOVE RIGHT
 			{
 				Piece piece;
 				if(pieces.size() > 1){
@@ -158,7 +139,6 @@ void Board::PlayerInput(SDL_Keycode key){
 				
 			}
 		}
-
 		else if(key == SDLK_e){ //ROTATE RIGHT
 			if(pieces.size() >= 2){
 				Piece pivot;
@@ -176,33 +156,40 @@ void Board::PlayerInput(SDL_Keycode key){
 				//CASE SIDE BY SIDE
 				if(pivot.y == other.y){
 					if(pivot.x < other.x){// IF PIVOT ON THE LEFT
-						if(board[other.x - 1][other.y + 1].free && other.y + 1 < rows && other.x - 1 >= 0){
-							RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y + 1]); //MOVE OTHER TO PLACE BELLOW PIVOT
+						if(other.x - 1 >= 0 && other.y + 1 < rows){
+							if(board[other.x - 1][other.y + 1].free ){
+								RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y + 1]); //MOVE OTHER TO PLACE BELLOW PIVOT
+							}
 						}
 					}
 					else if(pivot.x > other.x){// IF PIVOT ON THE RIGHT
-						if(board[other.x - 1][other.y + 1].free && other.x + 1 < cols && other.y - 1 >= 0){
-							RedrawPieces(board[other.x][other.y], board[other.x + 1][pivot.y - 1]); //MOVE OTHER TO PLACE ABOVE PIVOT
+						if(other.x + 1 < cols && other.y - 1 >= 0){
+							if(board[other.x + 1][other.y - 1].free ){
+								RedrawPieces(board[other.x][other.y], board[other.x + 1][pivot.y - 1]); //MOVE OTHER TO PLACE ABOVE PIVOT
+							}
 						}
 					}
 				}
 				//CASE VERTICAL
 				else if(pivot.x == other.x){
-					if(pivot.y > other.y){ //IF PIVOT ABOVE OTHER
-						if(board[other.x - 1][other.y + 1].free && other.x + 1 < cols && other.y + 1 < rows){
-							RedrawPieces(board[other.x][other.y], board[other.x + 1][other.y + 1]); //MOVE OTHER TO PLACE LEFT OF PIVOT
-						}
+					if(pivot.y > other.y){ //IF PIVOT BELOW OTHER
+						if(other.x + 1 < cols && other.y + 1 < rows){
+							if(board[other.x + 1][other.y + 1].free){
+								RedrawPieces(board[other.x][other.y], board[other.x + 1][other.y + 1]); //MOVE OTHER TO PLACE RIGHT OF PIVOT
+							}
+						}		
 					}
-					else if(pivot.y < other.y){ //IF PIVOT BELLOW OTHER
-						if(board[other.x - 1][other.y + 1].free && other.x - 1 >= 0 && other.y - 1 >= 0){
-							RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y - 1]); //MOVE OTHER TO PLACE RIGHT OF PIVOT
+					else if(pivot.y < other.y){ //IF PIVOT ABOVE OTHER
+						if(other.x - 1 >= 0 && other.y - 1 >= 0){
+							if(board[other.x - 1][other.y - 1].free){
+								RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y - 1]); //MOVE OTHER TO PLACE LEFT OF PIVOT
+							}
 						}
 					}
 				}
 			}
 		}
-
-		else if(key == SDLK_q){ //ROTATE RIGHT
+		else if(key == SDLK_q){ //ROTATE LEFT
 			if(pieces.size() >= 2){
 				Piece pivot;
 				Piece other;
@@ -219,26 +206,34 @@ void Board::PlayerInput(SDL_Keycode key){
 				//CASE SIDE BY SIDE
 				if(pivot.y == other.y){
 					if(pivot.x < other.x){// IF PIVOT ON THE LEFT
-						if(board[other.x - 1][other.y + 1].free && other.x - 1 >= 0 && other.y - 1 >= 0){
-							RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y - 1]); //MOVE OTHER TO PLACE BELLOW PIVOT
+						if(other.x - 1 >= 0 && other.y - 1 >= 0){
+							if(board[other.x - 1][other.y - 1].free){
+								RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y - 1]); //MOVE OTHER TO PLACE ABOVE PIVOT
+							}
 						}
 					}
 					else if(pivot.x > other.x){// IF PIVOT ON THE RIGHT
-						if(board[other.x - 1][other.y + 1].free && other.x + 1 < cols && other.y + 1 < rows){
-							RedrawPieces(board[other.x][other.y], board[other.x + 1][pivot.y + 1]); //MOVE OTHER TO PLACE ABOVE PIVOT
+						if(other.x + 1 < cols && other.y + 1 < rows){
+							if(board[other.x + 1][other.y + 1].free){
+								RedrawPieces(board[other.x][other.y], board[other.x + 1][pivot.y + 1]); //MOVE OTHER TO PLACE BELLOW PIVOT
+							}
 						}
 					}
 				}
 				//CASE VERTICAL
 				else if(pivot.x == other.x){
-					if(pivot.y > other.y){ //IF PIVOT ABOVE OTHER
-						if(board[other.x - 1][other.y + 1].free  && other.x - 1 >= 0 && other.y + 1 < rows){
-							RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y + 1]); //MOVE OTHER TO PLACE LEFT OF PIVOT
+					if(pivot.y > other.y){ //IF PIVOT BELLOW OTHER
+						if(other.x - 1 >= 0 && other.y + 1 < rows){
+							if(board[other.x - 1][other.y + 1].free){
+								RedrawPieces(board[other.x][other.y], board[other.x - 1][other.y + 1]); //MOVE OTHER TO PLACE LEFT OF PIVOT
+							}
 						}
 					}
-					else if(pivot.y < other.y){ //IF PIVOT BELLOW OTHER
-						if(board[other.x - 1][other.y + 1].free && other.x + 1 < cols && other.y - 1 >= 0){
-						RedrawPieces(board[other.x][other.y], board[other.x + 1][other.y - 1]); //MOVE OTHER TO PLACE RIGHT OF PIVOT
+					else if(pivot.y < other.y){ //IF PIVOT ABOVE OTHER
+						if(other.x + 1 < cols && other.y - 1 >= 0){
+							if(board[other.x + 1][other.y - 1].free){
+							RedrawPieces(board[other.x][other.y], board[other.x + 1][other.y - 1]); //MOVE OTHER TO PLACE RIGHT OF PIVOT
+							}
 						}
 					}
 				}
@@ -257,10 +252,11 @@ void Board::PlayerInput(SDL_Keycode key){
 				state = WAITING;
 		}
 	}
+	SDL_FlushEvent(SDL_KEYDOWN);
 }
 
 void Board::Move(Piece piece, int direction){
-	if(direction == DOWN){
+	if(direction == DOWN){ //Move Down
 		if (piece.y + 1 < rows && board[piece.x][piece.y + 1].free){
 			RedrawPieces(piece, board[piece.x][piece.y + 1]);
 		}
@@ -269,7 +265,7 @@ void Board::Move(Piece piece, int direction){
 			board[piece.x][piece.y].moving = false;
 		}
 	}
-	else if(direction == RIGHT){
+	else if(direction == RIGHT){ //Move Right
 		if (!keyboard){
 			return;
 		}
@@ -278,7 +274,7 @@ void Board::Move(Piece piece, int direction){
 		}
 
 	}
-	else if(direction == LEFT){
+	else if(direction == LEFT){ //Move Left
 		if (!keyboard){
 			return;
 		}
@@ -310,14 +306,14 @@ bool Board::SearchPuyos(){
 	return deleting;
 }
 
-void Board::FindConnected(Piece &p){
+void Board::FindConnected(Piece &p){ //Recursive function to find connections
 
-	if(!board[p.x][p.y].read){
+	if(!board[p.x][p.y].read){ //PIece being checked
 		board[p.x][p.y].read = true;
 		connected_pieces.push_back(board[p.x][p.y]);
 	}
-
-	if(p.x + 1 < cols && !board[p.x + 1][p.y].free && !board[p.x + 1][p.y].read){
+	//Check surroundings (4 directions - up, down, left , right)
+	if(p.x + 1 < cols && !board[p.x + 1][p.y].free && !board[p.x + 1][p.y].read){ //Check right of current piece
 		if(UtilsEqualColors(board[p.x + 1][p.y].color,p.color)){
 			board[p.x + 1][p.y].read = true;
 			connected_pieces.push_back(board[p.x + 1][p.y]);
@@ -325,7 +321,7 @@ void Board::FindConnected(Piece &p){
 		}
 	}
 
-	if(p.x - 1 > 0 && !board[p.x - 1][p.y].free && !board[p.x - 1][p.y].read){
+	if(p.x - 1 > 0 && !board[p.x - 1][p.y].free && !board[p.x - 1][p.y].read){ //Check left of current piece
 		if(UtilsEqualColors(board[p.x - 1][p.y].color,p.color)){
 			board[p.x - 1][p.y].read = true;
 			connected_pieces.push_back(board[p.x - 1][p.y]);
@@ -333,7 +329,7 @@ void Board::FindConnected(Piece &p){
 		}
 	}
 
-	if(p.y + 1 < rows && !board[p.x][p.y + 1].free && !board[p.x][p.y + 1].read){
+	if(p.y + 1 < rows && !board[p.x][p.y + 1].free && !board[p.x][p.y + 1].read){ //Check bellow of current piece
 		if(UtilsEqualColors(board[p.x][p.y + 1].color, p.color)){
 			board[p.x][p.y + 1].read = true;
 			connected_pieces.push_back(board[p.x][p.y + 1]);
@@ -341,7 +337,7 @@ void Board::FindConnected(Piece &p){
 		}
 	}
 
-	if(p.y - 1 > 0 && !board[p.x][p.y - 1].free && !board[p.x][p.y - 1].read){
+	if(p.y - 1 > 0 && !board[p.x][p.y - 1].free && !board[p.x][p.y - 1].read){ //Check above of current piece
 		if(UtilsEqualColors(board[p.x][p.y - 1].color, p.color)){
 			board[p.x][p.y - 1].read = true;
 			connected_pieces.push_back(board[p.x][p.y - 1]);
@@ -411,13 +407,6 @@ bool Board::ClearConnectedPieces(){
 	return flag;
 }
 
-void Board::GameOver(){
-
-}
-
-void Board::Pause(){
-
-}
 
 void Board::Draw(){
 	for(int x = 0; x < cols; x++){
@@ -425,7 +414,6 @@ void Board::Draw(){
 			DrawPieces(board[x][y], board[x][y].color);
 		}
 	}
-	
 }
 
 void Board::DrawPieces(Piece piece, SDL_Color color){
@@ -441,7 +429,7 @@ void Board::DrawPieces(Piece piece, SDL_Color color){
 	SDL_RenderFillRect(renderer, &Rect2);
 }
 
-void Board::RedrawPieces(Piece old_piece, Piece new_piece){
+void Board::RedrawPieces(Piece old_piece, Piece new_piece){ //Draw a piece in a different location
 	if (new_piece.x < cols && new_piece.x >= 0 && new_piece.y < rows){
 		board[new_piece.x][new_piece.y].Clone(board[old_piece.x][old_piece.y]);
 		board[old_piece.x][old_piece.y].Reset();
@@ -458,10 +446,3 @@ void Board::DrawScreenBoard(){
 	SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
 	SDL_RenderDrawRect(renderer, &sdl_board);
 }
-
-void Board::SetRenderer(SDL_Renderer *renderer){
-	this->renderer = renderer;
-}
-
-
-

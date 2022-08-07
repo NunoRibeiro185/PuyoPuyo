@@ -13,8 +13,8 @@ static const int MARGIN = 10;
 static const int PUYO_WIDTH = 58;
 static const int PUYO_HEIGHT = 58;
 
-enum Direction{ LEFT=0, RIGHT, UP, DOWN, FLIP};
-enum State { STARTING=0, FALLING_PIECE, DELETING, ORDERING, PAUSE, GAMEOVER, EXIT, WAITING, PRESSING_KEY, SORTING_PIECES, DELETING_PIECES};
+enum Direction{ LEFT=0, RIGHT, UP, DOWN};
+enum State { STARTING=0, PAUSE, GAMEOVER, EXIT, WAITING, PRESSING_KEY, SORTING_PIECES, DELETING_PIECES};
 
 class Board {
     public:
@@ -33,9 +33,6 @@ class Board {
     void Draw();
 	void DrawScreenBoard();
 
-    void GameOver();
-    void Pause();
-
     int* WindowSize();
 
     void PlayerInput(SDL_Keycode);
@@ -43,7 +40,6 @@ class Board {
 
     void DropNewPiece();
     bool UpdateFalling();
-    bool UpdateFalling2();
 
     void DrawPieces(Piece, SDL_Color);
     void RedrawPieces(Piece, Piece);

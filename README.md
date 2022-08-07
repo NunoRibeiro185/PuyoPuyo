@@ -47,10 +47,10 @@ make
 
 
 ## How to play
-
 A - Move Left
 D - Mode Right
 S - Move Down Faster
+(Can also use arrow keys)
                            ___
 E - Turn 90 Degrees Right     |
                               V
@@ -65,4 +65,23 @@ ENTER after Game Over - Restart
 
 ## Notes
 
-- Some bugs need fixing
+This was the first time I used SDL and C++ to make a game. There were a lot of mistakes that I made when
+starting this exercise and using the SDL library that if the exercise were to be repeated I would be much better at. 
+It was a very nice and interesting experience and fun to be a part of. 
+My main focus was the criteria presented in the document as I knew I would be tight on time
+because I couldn't spend many hours daily working on this exercise. 
+
+Some bugs that need fixing:
+- !!!FIXED!!! When rotating fast there's a scenario where one of the pieces the player is controlling 
+overlaps with one on the board and replaces it 
+I believe this happens when the turn and the move down actions are performed in close proximity
+- Some slow downs here and there that could be fixed with some optimization
+- Moving with arrow keys is much faster
+
+For this exercise I stuck to the things that were asked for the sake of brevity
+However here are some thing that could be added with more time/if wanted:
+- Score
+- Pause Menu
+- Game Over Screen
+- Speed Up Mechanic
+- Pieces coming up next 
